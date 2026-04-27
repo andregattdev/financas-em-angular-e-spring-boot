@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-ApiFinancasApplication<api-financas>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "app.ApiFinancasApplication",
+            "projectName": "api-financas",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}
