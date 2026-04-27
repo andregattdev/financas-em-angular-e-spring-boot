@@ -1,49 +1,76 @@
-💰 Finanças em Angular e Spring Boot
-Uma solução Full Stack completa para controle financeiro pessoal. Esta API REST robusta e sua interface intuitiva permitem o gerenciamento eficiente de receitas e despesas com foco em segurança e performance.
+Finanças em Angular e Spring Boot
+Uma solução Full Stack completa para controle financeiro pessoal. A aplicação permite que o usuário gerencie seu ciclo financeiro total, desde a organização por categorias até a análise de dados através de dashboards detalhados de receitas e despesas.
 
-🚀 Tecnologias
+Tecnologias
 Backend
 Java 21 (LTS) e Spring Boot 4.0.5
 
-Spring Security & JWT: Autenticação e autorização stateless.
+Spring Security & JWT: Autenticação stateless com extração de identidade via SecurityContextHolder.
 
-Spring Data JPA: Abstração e persistência de dados.
+Spring Data JPA: Persistência de dados e consultas customizadas.
 
 PostgreSQL: Banco de dados relacional de alta confiabilidade.
 
-Maven: Gerenciamento de dependências.
+Maven: Gerenciamento de dependências e build.
 
-Frontend (Em desenvolvimento)
-Angular: Framework para uma interface dinâmica e responsiva.
+Frontend
+Angular: Framework para uma interface de usuário dinâmica e reativa.
 
-CSS Puro: Estilização focada em performance e agilidade de carregamento.
+CSS Puro: Estilização focada em performance, mantendo a interface leve e funcional.
 
-🏗️ Arquitetura do Sistema
-O backend foi construído seguindo os princípios da Clean Architecture, garantindo que as regras de negócio sejam independentes de frameworks externos:
+Arquitetura do Sistema
+O backend foi construído seguindo os princípios da Clean Architecture, garantindo que as regras de negócio sejam independentes e seguras:
 
-Model: Entidades JPA que representam o domínio (Usuário, Receita, Despesa).
+Controller: Endpoints especializados (/api/categorias, /api/transacoes, /api/financeiro) que gerenciam a comunicação REST e filtros de busca.
 
-Repository: Camada de acesso aos dados via JpaRepository.
+Service: Centraliza a lógica de negócio, realizando a validação de posse (garantindo que um usuário não acesse dados de outro).
 
-Service: Camada onde reside a lógica de negócio, como validações de posse e cálculos de recorrência.
+DTO (Data Transfer Objects): Segurança e desacoplamento total entre o banco de dados e o que é enviado para o Angular.
 
-DTO (Data Transfer Objects): Segurança e desacoplamento na trafegação de dados entre frontend e backend.
+Model/Entity: Mapeamento objeto-relacional com JPA para representação de Usuários, Categorias e Transações.
 
-Controller: Endpoints REST que expõem os recursos da aplicação.
+Segurança e Regras de Negócio
+Multi-tenancy Lógico: Toda transação é vinculada ao ID do usuário autenticado via JWT, garantindo isolamento total dos dados.
 
-🔒 Segurança e Regras de Negócio
-Proteção de Dados: Senhas criptografadas antes do armazenamento.
+Validação de Payload: Uso de @Valid e DTOs para garantir a integridade dos dados recebidos.
 
-JWT: Fluxo de login moderno com tokens de curta duração.
+Segurança de Métodos: Validação manual de propriedade em operações de UPDATE e DELETE.
 
-Isolamento: Cada usuário possui acesso estritamente aos seus próprios registros, validado na camada de Service.
+Funcionalidades Implementadas
+[x] Gestão de Usuários: Cadastro seguro com criptografia de senhas e autenticação via Token.
 
-📋 Funcionalidades
-[x] Cadastro de Usuários: Registro seguro com criptografia de senha.
+[x] Controle de Categorias: Organização personalizada de despesas e receitas por usuário.
 
-[x] Gestão de Receitas: CRUD completo de entradas financeiras.
+[x] Gestão de Transações: CRUD completo com filtros por período (Mês/Ano).
 
-[x] Gestão de Despesas: Controle total de saídas e gastos.
+[x] Dashboard Financeiro: - Histórico anual de movimentações.
 
-[x] Autenticação Stateless: Login via Token JWT.
+Resumo de saldos (Entradas vs. Saídas).
 
+Agrupamento de gastos por categoria.
+
+Monitoramento de fluxo de caixa diário.
+
+Como Executar o Projeto
+Clonar Repositório:
+
+Bash
+git clone https://github.com/andregattdev/financas-em-angular-e-spring-boot.git
+Backend:
+
+Configure o PostgreSQL no application.properties.
+
+Execute: ./mvnw spring-boot:run.
+
+Frontend:
+
+Instale as dependências: npm install.
+
+Inicie o servidor: ng serve.
+
+Próximos Passos (Roadmap)
+[ ] Implementação de paginação nativa no Spring Data.
+
+[ ] Geração de relatórios em PDF/Excel.
+
+[ ] Notificações de contas a vencer.
