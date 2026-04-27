@@ -1,41 +1,49 @@
-API Controle de gastos
-Uma API REST robusta e segura para gerenciamento de receitas e despesas, construída com o ecossistema Spring e foco em alta performance e segurança.
+💰 Finanças em Angular e Spring Boot
+Uma solução Full Stack completa para controle financeiro pessoal. Esta API REST robusta e sua interface intuitiva permitem o gerenciamento eficiente de receitas e despesas com foco em segurança e performance.
 
-Tecnologias Utilizadas
-Java 21 (LTS)
+🚀 Tecnologias
+Backend
+Java 21 (LTS) e Spring Boot 4.0.5
 
-Spring Boot 4.0.5 (Framework base)
+Spring Security & JWT: Autenticação e autorização stateless.
 
-Spring Security & JWT (Autenticação e Autorização Stateless)
+Spring Data JPA: Abstração e persistência de dados.
 
-Spring Data JPA (Persistência de dados)
+PostgreSQL: Banco de dados relacional de alta confiabilidade.
 
-PostgreSQL (Banco de dados de produção)
+Maven: Gerenciamento de dependências.
 
-Maven (Gerenciamento de dependências)
+Frontend (Em desenvolvimento)
+Angular: Framework para uma interface dinâmica e responsiva.
 
-Arquitetura do Projeto
-O projeto segue os princípios da Clean Architecture e separação de responsabilidades em camadas:
+CSS Puro: Estilização focada em performance e agilidade de carregamento.
 
-Model: Entidades JPA que representam o usuario, a receita e a despesa
+🏗️ Arquitetura do Sistema
+O backend foi construído seguindo os princípios da Clean Architecture, garantindo que as regras de negócio sejam independentes de frameworks externos:
 
-Repository: Interfaces que estendem JpaRepository para abstração do banco de dados.
+Model: Entidades JPA que representam o domínio (Usuário, Receita, Despesa).
 
-Service: Camada de regras de negócio, onde reside a inteligência de validação de posse e lógica de recorrência.
+Repository: Camada de acesso aos dados via JpaRepository.
 
-DTO (Data Transfer Objects): Objetos de transferência para desacoplar a API do modelo de dados.
+Service: Camada onde reside a lógica de negócio, como validações de posse e cálculos de recorrência.
 
-Controller: Endpoints REST que gerenciam a comunicação com o front-end.
+DTO (Data Transfer Objects): Segurança e desacoplamento na trafegação de dados entre frontend e backend.
 
-Segurança
-A API implementa um fluxo de segurança moderno:
+Controller: Endpoints REST que expõem os recursos da aplicação.
 
-As senhas dos usuários são criptografadas antes de serem armazenadas no banco.
+🔒 Segurança e Regras de Negócio
+Proteção de Dados: Senhas criptografadas antes do armazenamento.
 
+JWT: Fluxo de login moderno com tokens de curta duração.
 
-Autenticação baseada em Tokens JWT (JSON Web Tokens).
+Isolamento: Cada usuário possui acesso estritamente aos seus próprios registros, validado na camada de Service.
 
-📋 Funcionalidades Principais
-[x] Cadastro de Usuários: Registro seguro.
+📋 Funcionalidades
+[x] Cadastro de Usuários: Registro seguro com criptografia de senha.
 
-[x] Gestão de Despesas e receitas: CRUD completo.
+[x] Gestão de Receitas: CRUD completo de entradas financeiras.
+
+[x] Gestão de Despesas: Controle total de saídas e gastos.
+
+[x] Autenticação Stateless: Login via Token JWT.
+
