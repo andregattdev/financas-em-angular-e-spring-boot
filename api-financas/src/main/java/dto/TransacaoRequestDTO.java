@@ -12,5 +12,8 @@ public record TransacaoRequestDTO(
 	    @NotNull @Positive BigDecimal valor,
 	    @NotNull LocalDate data,
 	    @NotNull TipoTransacao tipo,
-	    @NotNull Long categoriaId
+	    @NotNull Long categoriaId,
+	    Integer parcelas,
+	    Integer diaVencimento,
+	    Boolean pago
 	) {}

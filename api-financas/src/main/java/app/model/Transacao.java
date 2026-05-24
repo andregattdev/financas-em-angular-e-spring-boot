@@ -3,8 +3,6 @@ package app.model;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-import jakarta.persistence.ManyToOne;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -13,10 +11,17 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "tb_transacao")
+@Getter
+@Setter
+@NoArgsConstructor
 public class Transacao {
 
 	@Id
@@ -44,21 +49,14 @@ public class Transacao {
 	@JoinColumn(name = "usuario_id")
 	private Usuario usuario;
 
-	@Override
-	public String toString() {
-		return "Transacao [id=" + id + ", descricao=" + descricao + ", valor=" + valor + ", data=" + data + ", tipo="
-				+ tipo + ", categoria=" + categoria + ", usuario=" + usuario + ", getId()=" + getId()
-				+ ", getDescricao()=" + getDescricao() + ", getValor()=" + getValor() + ", getData()=" + getData()
-				+ ", getTipo()=" + getTipo() + ", getCategoria()=" + getCategoria() + ", getClass()=" + getClass()
-				+ ", hashCode()=" + hashCode() + ", toString()=" + super.toString() + "]";
-	}
+	@Column(columnDefinition = "boolean default false")
+	private Boolean pago = false;
 
-	public Transacao() {
-	}
+	@Column(name = "codigo_parcelamento")
+	private String codigoParcelamento;
 
 	public Transacao(Long id, String descricao, BigDecimal valor, LocalDate data, TipoTransacao tipo,
-			Categoria categoria, Usuario usuario) {
-		super();
+			Categoria categoria, Usuario usuario, Boolean pago) {
 		this.id = id;
 		this.descricao = descricao;
 		this.valor = valor;
@@ -66,62 +64,6 @@ public class Transacao {
 		this.tipo = tipo;
 		this.categoria = categoria;
 		this.usuario = usuario;
+		this.pago = pago;
 	}
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	public String getDescricao() {
-		return descricao;
-	}
-
-	public void setDescricao(String descricao) {
-		this.descricao = descricao;
-	}
-
-	public BigDecimal getValor() {
-		return valor;
-	}
-
-	public void setValor(BigDecimal valor) {
-		this.valor = valor;
-	}
-
-	public LocalDate getData() {
-		return data;
-	}
-
-	public void setData(LocalDate data) {
-		this.data = data;
-	}
-
-	public TipoTransacao getTipo() {
-		return tipo;
-	}
-
-	public void setTipo(TipoTransacao tipo) {
-		this.tipo = tipo;
-	}
-
-	public Categoria getCategoria() {
-		return categoria;
-	}
-
-	public void setCategoria(Categoria categoria) {
-		this.categoria = categoria;
-	}
-
-	public Usuario getUsuario() {
-		return usuario;
-	}
-
-	public void setUsuario(Usuario usuario) {
-		this.usuario = usuario;
-	}
-
 }

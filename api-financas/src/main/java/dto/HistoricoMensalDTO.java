@@ -5,6 +5,8 @@ import java.math.BigDecimal;
 public record HistoricoMensalDTO(
 		String mesAno, 
 		BigDecimal receitas, 
-		BigDecimal despesas) {
+		BigDecimal despesas,
+		BigDecimal saldoMes,
+		BigDecimal saldoAcumulado) {
 
 }

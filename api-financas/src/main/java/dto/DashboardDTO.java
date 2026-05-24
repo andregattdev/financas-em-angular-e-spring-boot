@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 public record DashboardDTO(
 		BigDecimal totalReceitas,
 	    BigDecimal totalDespesas,
-	    BigDecimal saldoGeral) {
+	    BigDecimal saldoGeral,
+		BigDecimal saldoAcumulado) {
 
 }

@@ -77,4 +77,10 @@ public class TransacaoController {
         transacaoService.deletar(id, getUsuarioLogado().getId());
         return ResponseEntity.noContent().build();
     }
+
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<Transacao> atualizarStatus(@PathVariable Long id, @RequestParam boolean pago) {
+        Transacao transacao = transacaoService.atualizarStatus(id, pago, getUsuarioLogado().getId());
+        return ResponseEntity.ok(transacao);
+    }
 }

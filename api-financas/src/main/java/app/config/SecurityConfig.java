@@ -57,8 +57,8 @@ public class SecurityConfig {
         // Permite a origem do seu projeto Angular
         configuration.setAllowedOrigins(List.of("http://localhost:4200"));
         
-        // Permite os métodos HTTP necessários
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        // Permite os métodos HTTP necessários (incluindo PATCH para o status)
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         
         // Permite cabeçalhos importantes, incluindo o Authorization para o Token JWT
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept"));

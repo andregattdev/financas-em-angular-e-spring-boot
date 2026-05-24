@@ -39,17 +39,61 @@ public class TransacaoService {
         Categoria categoria = categoriaRepository.findById(dto.categoriaId())
                 .orElseThrow(() -> new CategoriaNotFoundException(dto.categoriaId()));
 
-        Transacao transacao = new Transacao();
-        transacao.setDescricao(dto.descricao());
-        transacao.setValor(dto.valor());
-        transacao.setData(dto.data());
-        transacao.setTipo(dto.tipo());
-        transacao.setCategoria(categoria);
+        int numParcelas = (dto.parcelas() != null && dto.parcelas() > 1) ? dto.parcelas() : 1;
+        BigDecimal valorTotal = dto.valor();
+        BigDecimal valorParcela = valorTotal.divide(BigDecimal.valueOf(numParcelas), 2, java.math.RoundingMode.HALF_UP);
         
-        // AQUI ESTÁ O SEGREDO: Vinculamos o dono da transação
-        transacao.setUsuario(usuarioLogado); 
+        Transacao primeiraTransacao = null;
+        String codigoParcelamento = (numParcelas > 1) ? java.util.UUID.randomUUID().toString() : null;
 
-        return transacaoRepository.save(transacao);
+        java.time.LocalDate dataBase = dto.data();
+        if (dto.diaVencimento() != null && dto.diaVencimento() >= 1 && dto.diaVencimento() <= 31) {
+            int year = dataBase.getYear();
+            int month = dataBase.getMonthValue();
+            int maxDays = java.time.YearMonth.of(year, month).lengthOfMonth();
+            int day = Math.min(dto.diaVencimento(), maxDays);
+            dataBase = java.time.LocalDate.of(year, month, day);
+        }
+
+        for (int i = 0; i < numParcelas; i++) {
+            Transacao transacao = new Transacao();
+            
+            if (numParcelas > 1) {
+                transacao.setDescricao(dto.descricao() + " (" + (i + 1) + "/" + numParcelas + ")");
+                transacao.setValor(valorParcela);
+            } else {
+                transacao.setDescricao(dto.descricao());
+                transacao.setValor(valorTotal);
+            }
+            
+            java.time.LocalDate dataParcela = dataBase.plusMonths(i);
+            if (dto.diaVencimento() != null && dto.diaVencimento() >= 1 && dto.diaVencimento() <= 31) {
+                int maxDays = java.time.YearMonth.of(dataParcela.getYear(), dataParcela.getMonthValue()).lengthOfMonth();
+                int day = Math.min(dto.diaVencimento(), maxDays);
+                dataParcela = java.time.LocalDate.of(dataParcela.getYear(), dataParcela.getMonthValue(), day);
+            }
+            
+            transacao.setData(dataParcela);
+            transacao.setTipo(dto.tipo());
+            transacao.setCategoria(categoria);
+            transacao.setUsuario(usuarioLogado); 
+            
+            if (i == 0) {
+                transacao.setPago(dto.pago() != null ? dto.pago() : false);
+            } else {
+                transacao.setPago(false);
+            }
+            
+            transacao.setCodigoParcelamento(codigoParcelamento);
+            
+            transacao = transacaoRepository.save(transacao);
+            
+            if (i == 0) {
+                primeiraTransacao = transacao;
+            }
+        }
+
+        return primeiraTransacao;
     }
 
     @Transactional(readOnly = true)
@@ -76,8 +120,22 @@ public class TransacaoService {
         transacaoExistente.setData(dto.data());
         transacaoExistente.setTipo(dto.tipo());
         transacaoExistente.setCategoria(categoria);
+        transacaoExistente.setPago(dto.pago() != null ? dto.pago() : false);
 
         return transacaoRepository.save(transacaoExistente);
+    }
+
+    @Transactional
+    public Transacao atualizarStatus(Long id, boolean pago, Long usuarioId) {
+        Transacao transacao = transacaoRepository.findById(id)
+                .orElseThrow(() -> new TransacaoNotFoundException(id));
+        
+        if (!transacao.getUsuario().getId().equals(usuarioId)) {
+            throw new RuntimeException("Acesso negado: esta transação não pertence a você.");
+        }
+
+        transacao.setPago(pago);
+        return transacaoRepository.save(transacao);
     }
 
     @Transactional
@@ -89,7 +147,18 @@ public class TransacaoService {
             throw new RuntimeException("Acesso negado.");
         }
         
-        transacaoRepository.delete(transacao);
+        if (transacao.getCodigoParcelamento() != null) {
+            List<Transacao> parcelasFuturas = transacaoRepository
+                .findByCodigoParcelamentoAndDataGreaterThanEqual(transacao.getCodigoParcelamento(), transacao.getData());
+            
+            for (Transacao p : parcelasFuturas) {
+                if (p.getUsuario().getId().equals(usuarioId)) {
+                    transacaoRepository.delete(p);
+                }
+            }
+        } else {
+            transacaoRepository.delete(transacao);
+        }
     }
 
     @Transactional(readOnly = true)
@@ -100,7 +169,8 @@ public class TransacaoService {
         receitas = (receitas != null) ? receitas : BigDecimal.ZERO;
         despesas = (despesas != null) ? despesas : BigDecimal.ZERO;
 
-        return new DashboardDTO(receitas, despesas, receitas.subtract(despesas));
+        BigDecimal saldo = receitas.subtract(despesas);
+        return new DashboardDTO(receitas, despesas, saldo, saldo);
     }
     
     @Transactional(readOnly = true)
@@ -110,8 +180,20 @@ public class TransacaoService {
 
         receitas = (receitas != null) ? receitas : BigDecimal.ZERO;
         despesas = (despesas != null) ? despesas : BigDecimal.ZERO;
+        
+        // Calcula saldo acumulado até o final do mês selecionado
+        java.time.YearMonth yearMonth = java.time.YearMonth.of(ano, mes);
+        java.time.LocalDate dataLimite = yearMonth.atEndOfMonth();
+        
+        BigDecimal recAcumuladas = transacaoRepository.sumByTipoUpToDate(TipoTransacao.RECEITA, usuarioId, dataLimite);
+        BigDecimal despAcumuladas = transacaoRepository.sumByTipoUpToDate(TipoTransacao.DESPESA, usuarioId, dataLimite);
+        
+        recAcumuladas = (recAcumuladas != null) ? recAcumuladas : BigDecimal.ZERO;
+        despAcumuladas = (despAcumuladas != null) ? despAcumuladas : BigDecimal.ZERO;
+        
+        BigDecimal saldoAcumulado = recAcumuladas.subtract(despAcumuladas);
 
-        return new DashboardDTO(receitas, despesas, receitas.subtract(despesas));
+        return new DashboardDTO(receitas, despesas, receitas.subtract(despesas), saldoAcumulado);
     }
     
     @Transactional(readOnly = true)

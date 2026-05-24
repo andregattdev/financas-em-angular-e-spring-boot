@@ -27,6 +27,14 @@ public interface TransacaoRepository extends JpaRepository<Transacao, Long> {
         @Param("usuarioId") Long usuarioId
     );
 
+    // Soma por tipo até uma data específica
+    @Query("SELECT SUM(t.valor) FROM Transacao t WHERE t.tipo = :tipo AND t.usuario.id = :usuarioId AND t.data <= :dataLimite")
+    BigDecimal sumByTipoUpToDate(
+        @Param("tipo") TipoTransacao tipo, 
+        @Param("usuarioId") Long usuarioId, 
+        @Param("dataLimite") java.time.LocalDate dataLimite
+    );
+
     // 3. Busca transações por mês, ano e usuário (Lista filtrada)
     @Query("SELECT t FROM Transacao t WHERE MONTH(t.data) = :mes AND YEAR(t.data) = :ano AND t.usuario.id = :usuarioId")
     Page<Transacao> findByMesEAno(
@@ -83,4 +91,7 @@ public interface TransacaoRepository extends JpaRepository<Transacao, Long> {
 
     // Método auxiliar simples
     List<Transacao> findByUsuarioId(Long usuarioId);
+
+    // Método para buscar parcelas futuras
+    List<Transacao> findByCodigoParcelamentoAndDataGreaterThanEqual(String codigoParcelamento, java.time.LocalDate data);
 }
